@@ -1,3 +1,6 @@
+const db = require('../../data/db-config')
+
+
 module.exports = {
   get,
   getById,
@@ -7,21 +10,30 @@ module.exports = {
 }
 
 async function get() {
-  return 'get wired'
+  // const result = await db.raw('select * from shippers') --works but isn't the right way
+  const result = await db('shippers');
+  return result;
 }
 
-async function getById() {
-  return 'getById wired'
+async function getById(shipperid) {
+  const result = await db('shippers').where('shipperid', shipperid).first();
+  return result;
 }
 
-async function create() {
-  return 'create wired'
+async function create(shipper) {
+  const [shipperid] = await db('shippers').insert(shipper)
+  const result = await getById(shipperid)
+  return result;
 }
 
-async function update() {
-  return 'update wired'
+async function update(shipperid, changes) {
+  await db('shippers').update(changes).where('shipperid', shipperid)
+  const result = await getById(shipperid)
+  return result;
 }
 
-async function remove() {
-  return 'delete wired'
+async function remove(shipperid) {
+  const toBeDeleted = await getById(shipperid)
+  await db('shippers').delete().where('shipperid', shipperid)
+  return toBeDeleted;
 }
